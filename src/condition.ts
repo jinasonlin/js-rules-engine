@@ -20,7 +20,10 @@ export class Condition {
   /**
    * Condition operator.
    */
-  private operator: Operator;
+  private operatorName: string;
+  private get operator(): Operator {
+    return this.engine.getOperator(this.operatorName)
+  };
 
   /**
    * Condition value.
@@ -79,7 +82,7 @@ export class Condition {
     }
 
     this.fact = json.fact;
-    this.operator = this.engine.getOperator(json.operator);
+    this.operatorName = json.operator;
     this.value = json.value;
   }
 }

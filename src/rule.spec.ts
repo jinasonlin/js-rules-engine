@@ -39,6 +39,18 @@ describe('Rule class', () => {
       expect(rule.items[1].items[0] instanceof Condition).toEqual(true);
       expect(rule.items[1].items[1] instanceof Condition).toEqual(true);
     });
+
+    it('should coverage boundary', () => {
+      const json: RuleJson = {
+        and: [],
+        or: [],
+      };
+      expect(() => { new Rule(json) }).toThrow();
+
+      const empty: RuleJson = {};
+      const rule = new Rule(empty) as any;
+      expect(rule.type).toEqual('and');
+    });
   });
 
   describe('equals method', () => {
