@@ -1,5 +1,7 @@
 import { defaultOperators } from './default-operators';
 import { Operator } from './operator';
+import { get } from './utils';
+import { ResolverFn } from './interfaces'
 
 /**
  * Engine.
@@ -13,6 +15,12 @@ export class Engine {
    * Registered operators.
    */
   private operators: Operator[] = [];
+
+  /**
+   * Registered resolvers.
+   */
+  private resolver: ResolverFn;
+  private resolvers: Record<string, ResolverFn> = {};
 
   /**
    * Get operator by name.
@@ -55,5 +63,52 @@ export class Engine {
     if (index !== -1) {
       this.operators.splice(index, 1);
     }
+  }
+
+  /**
+   * Set default resolver.
+   *
+   * @param resolver Resolver to set.
+   */
+  setDefaultResolver(resolver: ResolverFn) {
+    this.resolver = resolver;
+  }
+
+  /**
+   * Reset default resolver.
+   */
+  resetDefaultResolver() {
+    this.resolver = undefined;
+  }
+
+  /**
+   * Add an resolver by name.
+   *
+   * @param fact resolver fact.
+   * @param resolver Resolver to add.
+   */
+  addResolver(fact: string, resolver: ResolverFn) {
+    this.resolvers[fact] = resolver;
+  }
+
+  /**
+   * Remove an resolver by fact.
+   *
+   * @param fact resolver fact.
+   */
+  removeResolver(fact: string) {
+    delete this.resolvers[fact]
+  }
+
+  getResolver(name: string) {
+    if (this.resolvers[name]) {
+      return this.resolvers[name];
+    }
+
+    if (this.resolver) {
+      return this.resolver;
+    }
+
+    return get;
   }
 }

@@ -9,6 +9,11 @@ export type RuleType = 'and' | 'or';
 export type OperatorFn = (a: any, b: any) => boolean;
 
 /**
+ * Resolver function.
+ */
+export type ResolverFn = (obj: any, path: string, value?: any) => any;
+
+/**
  * Rule json configuration.
  */
 export interface RuleJson extends Object {

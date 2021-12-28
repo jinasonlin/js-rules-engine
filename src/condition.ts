@@ -1,5 +1,3 @@
-import { get } from 'ts-dot-prop';
-
 import { Engine } from './engine';
 import { ConditionJson } from './interfaces';
 import { Operator } from './operator';
@@ -26,6 +24,13 @@ export class Condition {
   };
 
   /**
+   * Condition resolver.
+   */
+  private get resolver() {
+    return this.engine.getResolver(this.fact)
+  };
+
+  /**
    * Condition value.
    */
   private value: any;
@@ -41,7 +46,7 @@ export class Condition {
    * @param data Data object to use.
    */
   evaluate(data: Record<string, unknown>) {
-    const factValue = get(data, this.fact);
+    const factValue = this.resolver(data, this.fact);
     return this.operator.evaluate(factValue, this.value);
   }
 
@@ -51,7 +56,7 @@ export class Condition {
   toJSON() {
     return {
       fact: this.fact,
-      operator: this.operator.name,
+      operator: this.operatorName,
       value: this.value,
     };
   }
