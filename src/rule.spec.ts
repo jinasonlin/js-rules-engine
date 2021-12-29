@@ -186,5 +186,16 @@ describe('Rule class', () => {
         '{"and":[{"fact":"name","operator":"equals","value":"Luke Skywalker"}]}'
       );
     });
+
+    it('should nest rule stringify correctly', () => {
+      const rule = new Rule().and((sub) => {
+        sub.contains('name', 'Skywalker').equals('eyeColor', 'green');
+      });
+      const result = JSON.stringify(rule);
+
+      expect(result).toEqual(
+        '{"and":[{"and":[{"fact":"name","operator":"contains","value":"Skywalker"},{"fact":"eyeColor","operator":"equals","value":"green"}]}]}'
+      );
+    });
   });
 });

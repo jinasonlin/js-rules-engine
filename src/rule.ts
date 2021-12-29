@@ -200,9 +200,9 @@ export class Rule {
   /**
    * To json.
    */
-  toJSON() {
+  toJSON(): RuleJson {
     return {
-      [this.type]: this.items,
+      [this.type]: this.items.map((item) => item.toJSON()),
     };
   }
 

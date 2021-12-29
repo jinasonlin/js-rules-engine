@@ -53,7 +53,7 @@ export class Condition {
   /**
    * To json.
    */
-  toJSON() {
+  toJSON(): ConditionJson {
     return {
       fact: this.fact,
       operator: this.operatorName,
