@@ -28,4 +28,14 @@ export interface ConditionJson {
   fact: string;
   operator: string;
   value: any;
+  message?: string;
+}
+
+export interface EvaluateOptions {
+  message?: boolean;
+}
+
+export interface EvaluateResult {
+  result: boolean;
+  message?: string;
 }

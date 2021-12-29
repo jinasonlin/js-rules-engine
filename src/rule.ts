@@ -1,7 +1,7 @@
 import { Condition } from './condition';
 import { defaultEngine } from './default-engine';
 import { Engine } from './engine';
-import { ConditionJson, RuleJson, RuleType } from './interfaces';
+import { ConditionJson, RuleJson, RuleType, EvaluateResult } from './interfaces';
 
 /**
  * Rule.
@@ -179,21 +179,27 @@ export class Rule {
    *
    * @param data Data object to use.
    */
-  evaluate(data: Record<string, unknown>) {
+  evaluate(data: Record<string, unknown>): EvaluateResult {
+    let firstMessage;
+
     for (const item of this.items) {
-      const result = item.evaluate(data);
+      const { result, message } = item.evaluate(data);
+
+      if (!firstMessage && message) {
+        firstMessage = { message };
+      }
 
       if (this.type === 'and' && !result) {
-        return false;
+        return { result, ...firstMessage };
       } else if (this.type === 'or' && result) {
-        return true;
+        return { result };
       }
     }
 
     if (this.type === 'and') {
-      return true;
+      return { result: true };
     } else {
-      return false;
+      return { result: false, ...firstMessage };
     }
   }
 

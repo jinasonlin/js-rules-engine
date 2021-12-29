@@ -15,3 +15,7 @@ export const defaultOperators = [
   new Operator('greaterThan', (a, b) => a > b),
   new Operator('greaterThanOrEquals', (a, b) => a >= b),
 ];
+
+type ReturnOperatorNameType<T> = T extends ({ name: infer ElementType })[] ? ElementType : never;
+
+export type DefaultOperatorNames = ReturnOperatorNameType<typeof defaultOperators>;

@@ -56,80 +56,80 @@ describe('Rule class', () => {
   describe('equals method', () => {
     it('should evaluate true when value equals fact', () => {
       const rule = new Rule().equals('name', 'Luke Skywalker');
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
   describe('notEquals method', () => {
     it('should evaluate false when value equals fact', () => {
       const rule = new Rule().notEquals('name', 'Luke Skywalker');
-      expect(rule.evaluate(person)).toEqual(false);
+      expect(rule.evaluate(person)).toEqual({ result: false });
     });
   });
 
   describe('in method', () => {
     it('should evaluate true when value is in fact', () => {
       const rule = new Rule().in('name', 'Skywalker');
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
   describe('notIn method', () => {
     it('should evaluate false when value is in fact', () => {
       const rule = new Rule().notIn('name', 'Skywalker');
-      expect(rule.evaluate(person)).toEqual(false);
+      expect(rule.evaluate(person)).toEqual({ result: false });
     });
   });
 
   describe('contains method', () => {
     it('should evaluate true when value contains fact', () => {
       const rule = new Rule().contains('vehicles', 'Snowspeeder');
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
   describe('notContains method', () => {
     it('should evaluate false when value contains fact', () => {
       const rule = new Rule().notContains('vehicles', 'Snowspeeder');
-      expect(rule.evaluate(person)).toEqual(false);
+      expect(rule.evaluate(person)).toEqual({ result: false });
     });
   });
 
   describe('lessThan method', () => {
     it('should evaluate true when value is less than fact', () => {
       const rule = new Rule().lessThan('height', 200);
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
   describe('lessThanOrEquals method', () => {
     it('should evaluate true when value is less than fact', () => {
       const rule = new Rule().lessThanOrEquals('height', 200);
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
 
     it('should evaluate true when value equals fact', () => {
       const rule = new Rule().lessThanOrEquals('height', 200);
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
   describe('greaterThan method', () => {
     it('should evaluate true when value is greater than fact', () => {
       const rule = new Rule().greaterThan('height', 100);
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
   describe('greaterThanOrEquals method', () => {
     it('should evaluate true when value is greater than fact', () => {
       const rule = new Rule().greaterThanOrEquals('height', 100);
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
 
     it('should evaluate true when value equals fact', () => {
       const rule = new Rule().greaterThanOrEquals('height', 172);
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
@@ -139,7 +139,7 @@ describe('Rule class', () => {
         item.equals('name', 'Luke Skywalker').equals('eyeColor', 'blue');
       });
 
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
 
     it('should evaluate false when any conditions are false', () => {
@@ -147,7 +147,7 @@ describe('Rule class', () => {
         item.equals('name', 'Luke Skywalker').equals('eyeColor', 'green');
       });
 
-      expect(rule.evaluate(person)).toEqual(false);
+      expect(rule.evaluate(person)).toEqual({ result: false });
     });
   });
 
@@ -157,7 +157,7 @@ describe('Rule class', () => {
         item.equals('name', 'Luke Skywalker').equals('eyeColor', 'green');
       });
 
-      expect(rule.evaluate(person)).toEqual(true);
+      expect(rule.evaluate(person)).toEqual({ result: true });
     });
 
     it('should evaluate false when no conditions are true', () => {
@@ -165,7 +165,7 @@ describe('Rule class', () => {
         item.equals('name', 'Han Solo').equals('eyeColor', 'green');
       });
 
-      expect(rule.evaluate(person)).toEqual(false);
+      expect(rule.evaluate(person)).toEqual({ result: false });
     });
   });
 
@@ -174,7 +174,7 @@ describe('Rule class', () => {
       sub.contains('name', 'Skywalker').equals('eyeColor', 'green');
     });
 
-    expect(rule.evaluate(person)).toEqual(true);
+    expect(rule.evaluate(person)).toEqual({ result: true });
   });
 
   describe('toJSON method', () => {

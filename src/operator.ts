@@ -3,8 +3,8 @@ import { OperatorFn } from './interfaces';
 /**
  * Operator.
  */
-export class Operator {
-  constructor(name: string, fn: OperatorFn) {
+export class Operator<T extends string = string> {
+  constructor(name: T, fn: OperatorFn) {
     this.name = name;
     this.fn = fn;
   }
@@ -12,7 +12,7 @@ export class Operator {
   /**
    * Operator name.
    */
-  name: string;
+  readonly name: T;
 
   /**
    * Operator callback function.

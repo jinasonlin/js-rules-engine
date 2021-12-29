@@ -1,5 +1,5 @@
 import { Engine } from './engine';
-import { ConditionJson } from './interfaces';
+import { ConditionJson, EvaluateResult } from './interfaces';
 import { Operator } from './operator';
 
 /**
@@ -36,6 +36,11 @@ export class Condition {
   private value: any;
 
   /**
+   * Condition message.
+   */
+  private message: string;
+
+  /**
    * Engine instance.
    */
   private engine: Engine;
@@ -45,9 +50,10 @@ export class Condition {
    *
    * @param data Data object to use.
    */
-  evaluate(data: Record<string, unknown>) {
+  evaluate(data: Record<string, unknown>): EvaluateResult {
     const factValue = this.resolver(data, this.fact);
-    return this.operator.evaluate(factValue, this.value);
+    const result = this.operator.evaluate(factValue, this.value);
+    return result ? { result } : { result, message: this.message};
   }
 
   /**
@@ -89,5 +95,6 @@ export class Condition {
     this.fact = json.fact;
     this.operatorName = json.operator;
     this.value = json.value;
+    this.message = json.message;
   }
 }
