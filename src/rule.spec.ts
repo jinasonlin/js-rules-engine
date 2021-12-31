@@ -2,6 +2,7 @@ import { person } from '../test/mock-data';
 import { Condition } from './condition';
 import { RuleJson } from './interfaces';
 import { Rule } from './rule';
+import { Engine } from './engine';
 
 describe('Rule class', () => {
   describe('constructor', () => {
@@ -196,6 +197,45 @@ describe('Rule class', () => {
       expect(result).toEqual(
         '{"and":[{"and":[{"fact":"name","operator":"contains","value":"Skywalker"},{"fact":"eyeColor","operator":"equals","value":"green"}]}]}'
       );
+    });
+  });
+
+  describe('run case', () => {
+    it('should return faulse and message', () => {
+      const rule = new Rule({
+        and: [
+          {
+            fact: 'name',
+            operator: 'equals',
+            value: 'Luke Skywalker',
+            message: 'unknown',
+          },
+        ],
+      });
+      const { result, message } = rule.evaluate({ name: 'R2' });
+
+      expect(result).toEqual(false);
+      expect(message).toEqual('unknown');
+    });
+
+    it('should return true', () => {
+      const engine = new Engine();
+      engine.addResolver('key', (obj) => obj.name);
+      const rule = new Rule(
+        {
+          and: [
+            {
+              fact: 'key',
+              operator: 'equals',
+              value: 'Luke Skywalker',
+            },
+          ],
+        },
+        engine
+      );
+      const { result } = rule.evaluate({ name: 'Luke Skywalker' });
+
+      expect(result).toEqual(true);
     });
   });
 });

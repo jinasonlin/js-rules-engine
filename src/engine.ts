@@ -100,9 +100,9 @@ export class Engine {
     delete this.resolvers[fact]
   }
 
-  getResolver(name: string) {
-    if (this.resolvers[name]) {
-      return this.resolvers[name];
+  getResolver(fact: string) {
+    if (this.resolvers[fact]) {
+      return this.resolvers[fact];
     }
 
     if (this.resolver) {
