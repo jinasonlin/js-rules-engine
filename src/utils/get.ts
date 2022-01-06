@@ -52,17 +52,21 @@ export default (obj: any, path: string, value?: any): any => {
     return defaultValue;
   }
 
+  let nest = false;
+
   for (const key of parts) {
     if (key === '*') {
-      // do nothing
+      nest = true;
       continue;
     }
 
-    if (isArray(obj) && !indexer.test(key)) {
+    if (isArray(obj) && nest && !indexer.test(key)) {
       obj = obj.map((item) => isObject(item) && !isNull(item) ? item[key] : undefined);
     } else {
       obj = obj[key];
     }
+
+    nest = false;
 
     if (isUndefined(obj) || isNull(obj)) {
       break;

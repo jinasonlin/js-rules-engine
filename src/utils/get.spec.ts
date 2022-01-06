@@ -83,4 +83,9 @@ describe('get methods', () => {
     const value: any = get(obj, '__proto__');
     expect(value).toBeUndefined();
   });
+
+  it('should get array length', () => {
+    const value: any = get(obj, 'fruit.length');
+    expect(value).toEqual(2);
+  });
 });
