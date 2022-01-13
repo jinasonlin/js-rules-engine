@@ -6,7 +6,7 @@ export type RuleType = 'and' | 'or';
 /**
  * Operator callback function.
  */
-export type OperatorFn = (a: any, b: any) => boolean;
+export type OperatorFn<F extends any = any, V extends any = any> = (a: F, b: V) => boolean;
 
 /**
  * Resolver function.
@@ -14,12 +14,29 @@ export type OperatorFn = (a: any, b: any) => boolean;
 export type ResolverFn = (obj: any, path: string, value?: any) => any;
 
 /**
- * Rule json configuration.
+ * Rule json simplified configuration.
  */
-export interface RuleJson extends Object {
-  and?: Array<RuleJson | ConditionJson>;
-  or?: Array<RuleJson | ConditionJson>;
+export interface RuleJsonSimplified {
+  and?: Array<RuleItemJson>;
+  or?: Array<RuleItemJson>;
 }
+
+/**
+ * Rule json structured configuration.
+ */
+export interface RuleJsonStructured {
+  relation: RuleType;
+  conditions?: Array<RuleItemJson>;
+}
+
+/**
+ * Rule json specification.
+ */
+export type RuleSpec = 'simplified' | 'structured';
+
+export type RuleJson = RuleJsonSimplified | RuleJsonStructured;
+
+export type RuleItemJson = RuleJson | ConditionJson;
 
 /**
  * Condition json configuration.
@@ -28,6 +45,7 @@ export interface ConditionJson {
   fact: string;
   operator: string;
   value: any;
+  type?: 'string' | 'number' | 'boolean';
   message?: string;
 }
 

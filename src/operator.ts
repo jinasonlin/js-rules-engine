@@ -3,8 +3,8 @@ import { OperatorFn } from './interfaces';
 /**
  * Operator.
  */
-export class Operator<T extends string = string> {
-  constructor(name: T, fn: OperatorFn) {
+export class Operator<T extends string = string, F extends any = any, V extends any = any> {
+  constructor(name: T, fn: OperatorFn<F, V>) {
     this.name = name;
     this.fn = fn;
   }

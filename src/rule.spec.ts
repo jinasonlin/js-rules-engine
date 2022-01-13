@@ -41,6 +41,43 @@ describe('Rule class', () => {
       expect(rule.items[1].items[1] instanceof Condition).toEqual(true);
     });
 
+    it('should hydrate correctly - structured', () => {
+      const json: RuleJson = {
+        relation: 'and',
+        conditions: [
+          {
+            fact: 'name',
+            operator: 'equals',
+            value: 'Luke Skywalker',
+          },
+          {
+            relation: 'or',
+            conditions: [
+              {
+                fact: 'height',
+                operator: 'lessThan',
+                value: 200,
+              },
+              {
+                fact: 'height',
+                operator: 'greaterThan',
+                value: 100,
+              },
+            ],
+          },
+        ],
+      };
+      const rule = new Rule(json) as any;
+      expect(rule.type).toEqual('and');
+      expect(rule.items.length).toEqual(2);
+      expect(rule.items[0] instanceof Condition).toEqual(true);
+      expect(rule.items[1] instanceof Rule).toEqual(true);
+      expect(rule.items[1].type).toEqual('or');
+      expect(rule.items[1].items.length).toEqual(2);
+      expect(rule.items[1].items[0] instanceof Condition).toEqual(true);
+      expect(rule.items[1].items[1] instanceof Condition).toEqual(true);
+    });
+
     it('should coverage boundary', () => {
       const json: RuleJson = {
         and: [],
@@ -70,14 +107,14 @@ describe('Rule class', () => {
 
   describe('in method', () => {
     it('should evaluate true when value is in fact', () => {
-      const rule = new Rule().in('name', 'Skywalker');
+      const rule = new Rule().in('name', 'Luke Skywalker Legends');
       expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
 
   describe('notIn method', () => {
     it('should evaluate false when value is in fact', () => {
-      const rule = new Rule().notIn('name', 'Skywalker');
+      const rule = new Rule().notIn('name', 'Luke Skywalker Legends');
       expect(rule.evaluate(person)).toEqual({ result: false });
     });
   });
@@ -130,6 +167,27 @@ describe('Rule class', () => {
 
     it('should evaluate true when value equals fact', () => {
       const rule = new Rule().greaterThanOrEquals('height', 172);
+      expect(rule.evaluate(person)).toEqual({ result: true });
+    });
+  });
+
+  describe('between method', () => {
+    it('should evaluate true when fact is between value', () => {
+      const rule = new Rule().between('height', [170, 180]);
+      expect(rule.evaluate(person)).toEqual({ result: true });
+    });
+  });
+
+  describe('matchRegExp method', () => {
+    it('should evaluate true when value is match RegExp in fact', () => {
+      const rule = new Rule().matchRegExp('eyeColor', '^bl');
+      expect(rule.evaluate(person)).toEqual({ result: true });
+    });
+  });
+
+  describe('notMatchRegExp method', () => {
+    it('should evaluate true when value is not match RegExp is in fact', () => {
+      const rule = new Rule().notMatchRegExp('eyeColor', '^re');
       expect(rule.evaluate(person)).toEqual({ result: true });
     });
   });
@@ -218,6 +276,24 @@ describe('Rule class', () => {
       expect(message).toEqual('unknown');
     });
 
+    it('should return faulse and message - structured', () => {
+      const rule = new Rule({
+        relation: 'and',
+        conditions: [
+          {
+            fact: 'name',
+            operator: 'equals',
+            value: 'Luke Skywalker',
+            message: 'unknown',
+          },
+        ],
+      });
+      const { result, message } = rule.evaluate({ name: 'R2' });
+
+      expect(result).toEqual(false);
+      expect(message).toEqual('unknown');
+    });
+
     it('should return true', () => {
       const engine = new Engine();
       engine.addResolver('key', (obj) => obj.name);
@@ -228,6 +304,30 @@ describe('Rule class', () => {
               fact: 'key',
               operator: 'equals',
               value: 'Luke Skywalker',
+            },
+          ],
+        },
+        engine
+      );
+      const { result } = rule.evaluate({ name: 'Luke Skywalker' });
+
+      expect(result).toEqual(true);
+    });
+
+    
+
+    it('should return true - structured', () => {
+      const engine = new Engine();
+      engine.addResolver('key', (obj) => obj.name);
+      const rule = new Rule(
+        {
+          relation: 'and',
+          conditions: [
+            {
+              fact: 'name',
+              operator: 'equals',
+              value: 'Luke Skywalker',
+              message: 'unknown',
             },
           ],
         },

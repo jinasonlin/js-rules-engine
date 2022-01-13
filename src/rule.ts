@@ -1,12 +1,24 @@
 import { Condition } from './condition';
+import type { DefaultOperatorNames } from './default-operators';
 import { defaultEngine } from './default-engine';
 import { Engine } from './engine';
-import { ConditionJson, RuleJson, RuleType, EvaluateResult } from './interfaces';
+import type {
+  RuleJsonStructured,
+  RuleJsonSimplified,
+  RuleJson,
+  RuleItemJson,
+  RuleSpec,
+  RuleType,
+  EvaluateResult,
+} from './interfaces';
+
+type RuleDefaultOperatorMethod = (fact: string, value: any) => Rule;
+type RuleDefaultOperatorMethods = Record<Exclude<DefaultOperatorNames, 'isTrue' | 'isFalse'>, RuleDefaultOperatorMethod>;
 
 /**
  * Rule.
  */
-export class Rule {
+export class Rule implements RuleDefaultOperatorMethods {
   constructor(json?: RuleJson, engine?: Engine) {
     if (engine) {
       this.engine = engine;
@@ -133,14 +145,55 @@ export class Rule {
   }
 
   /**
-   * Add a condition.
+    * Add a condition with an between operator.
+    *
+    * @param fact Property name or dot notation path.
+    * @param value Value to compare.
+    */
+  between(fact: string, value: [number, number]) {
+    return this.add(fact, 'between', value);
+  }
+
+  /**
+    * Add a condition with an matchRegExp operator.
+    *
+    * @param fact Property name or dot notation path.
+    * @param value Value to compare.
+    */
+  matchRegExp(fact: string, value: string | [string, string]) {
+    return this.add(fact, 'matchRegExp', value);
+  }
+
+  /**
+    * Add a condition with an matchRegExp operator.
+    *
+    * @param fact Property name or dot notation path.
+    * @param value Value to compare.
+    */
+  notMatchRegExp(fact: string, value: string | [string, string]) {
+    return this.add(fact, 'notMatchRegExp', value);
+  }
+
+  /**
+   * Add a rule.
+   *
+   * @param rule The rule will be clone.
+   */
+  add(rule: RuleJson): Rule;
+  /**
+   * Add a rule or condition.
    *
    * @param fact Property name or dot notation path.
    * @param operator Name of operator to use.
    * @param value Value to compare.
    */
-  add(fact: string, operator: string, value: any) {
-    this.items.push(new Condition({ fact, operator, value }, this.engine));
+  add(fact: string, operator: string, value: any): Rule;
+  add(fact: string | RuleJson, operator?: string, value?: any) {
+    if (typeof fact !== 'string') {
+      this.items.push(new Rule(fact, this.engine));
+    } else {
+      this.items.push(new Condition({ fact, operator, value }, this.engine));
+    }
     return this;
   }
 
@@ -206,7 +259,13 @@ export class Rule {
   /**
    * To json.
    */
-  toJSON(): RuleJson {
+  toJSON(spec?: RuleSpec): RuleJson {
+    if (spec === 'structured') {
+      return {
+        relation: this.type,
+        conditions: this.items.map((item) => item.toJSON()),
+      }
+    }
     return {
       [this.type]: this.items.map((item) => item.toJSON()),
     };
@@ -218,16 +277,24 @@ export class Rule {
    * @param json Json object.
    */
   private init(json?: RuleJson) {
-    const hasOr = Object.prototype.hasOwnProperty.call(json, 'or');
-    const hasAnd = Object.prototype.hasOwnProperty.call(json, 'and');
+    let items: Array<RuleItemJson> = [];
 
-    if (hasOr && hasAnd) {
-      throw new Error('Rule: can only have on property ("and" / "or")');
+    if (this.isRuleJsonSimplified(json)) {
+      if (json?.or && json?.and) {
+        throw new Error('Rule: simplify rule can only have on property ("and" / "or")');
+      }
+
+      this.type = json?.or ? 'or' : 'and';
+
+      items = json.or || json.and || [];
     }
 
-    const items = json.or || json.and || [];
+    if (this.isRuleJsonStructured(json)) {
+      this.type = json.relation;
 
-    this.type = hasOr ? 'or' : 'and';
+      items = json.conditions || [];
+    }
+  
     this.items = items.map((item) => {
       if (this.isRule(item)) {
         return new Rule(item, this.engine);
@@ -238,14 +305,29 @@ export class Rule {
   }
 
   /**
+   * Identifies if a json object is a simplified spec rule.
+   *
+   * @param json Object to check.
+   */
+  private isRuleJsonSimplified(json: RuleItemJson): json is RuleJsonSimplified {
+    return Array.isArray((json as RuleJsonSimplified)?.and) || Array.isArray((json as RuleJsonSimplified)?.or);
+  }
+
+  /**
+   * Identifies if a json object is a default spec rule.
+   *
+   * @param json Object to check.
+   */
+  private isRuleJsonStructured(json: RuleItemJson): json is RuleJsonStructured {
+    return !!(json as RuleJsonStructured)?.relation;
+  }
+
+  /**
    * Identifies if a json object is a rule or a condition.
    *
    * @param json Object to check.
    */
-  private isRule(json: RuleJson | ConditionJson): json is RuleJson {
-    return (
-      Object.prototype.hasOwnProperty.call(json, 'and') ||
-      Object.prototype.hasOwnProperty.call(json, 'or')
-    );
+  private isRule(json: RuleItemJson): json is RuleJson {
+    return this.isRuleJsonSimplified(json) || this.isRuleJsonStructured(json);
   }
 }
