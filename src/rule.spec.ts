@@ -228,6 +228,44 @@ describe('Rule class', () => {
     });
   });
 
+  describe('add method', () => {
+    it('should hydrate correctly', () => {
+      const json: RuleJson = {
+        and: [
+          {
+            fact: 'name',
+            operator: 'equals',
+            value: 'Luke Skywalker',
+          },
+        ],
+      };
+      const jsonSub: RuleJson = {
+        or: [
+          {
+            fact: 'height',
+            operator: 'lessThan',
+            value: 200,
+          },
+          {
+            fact: 'height',
+            operator: 'greaterThan',
+            value: 100,
+          },
+        ],
+      };
+      const rule = new Rule(json) as any;
+      rule.add(jsonSub);
+      expect(rule.type).toEqual('and');
+      expect(rule.items.length).toEqual(2);
+      expect(rule.items[0] instanceof Condition).toEqual(true);
+      expect(rule.items[1] instanceof Rule).toEqual(true);
+      expect(rule.items[1].type).toEqual('or');
+      expect(rule.items[1].items.length).toEqual(2);
+      expect(rule.items[1].items[0] instanceof Condition).toEqual(true);
+      expect(rule.items[1].items[1] instanceof Condition).toEqual(true);
+    });
+  });
+
   it('complex rules should evaluate correctly', () => {
     const rule = new Rule().equals('homeWorld.name', 'Tatooine').or((sub) => {
       sub.contains('name', 'Skywalker').equals('eyeColor', 'green');
@@ -254,6 +292,26 @@ describe('Rule class', () => {
 
       expect(result).toEqual(
         '{"and":[{"and":[{"fact":"name","operator":"contains","value":"Skywalker"},{"fact":"eyeColor","operator":"equals","value":"green"}]}]}'
+      );
+    });
+
+    it('should stringify correctly - structured', () => {
+      const rule = new Rule().equals('name', 'Luke Skywalker');
+      const result = JSON.stringify(rule.toJSON('structured'));
+
+      expect(result).toEqual(
+        '{"relation":"and","conditions":[{"fact":"name","operator":"equals","value":"Luke Skywalker"}]}'
+      );
+    });
+
+    it('should nest rule stringify correctly - structured', () => {
+      const rule = new Rule().and((sub) => {
+        sub.contains('name', 'Skywalker').equals('eyeColor', 'green');
+      });
+      const result = JSON.stringify(rule.toJSON('structured'));
+
+      expect(result).toEqual(
+        '{"relation":"and","conditions":[{"and":[{"fact":"name","operator":"contains","value":"Skywalker"},{"fact":"eyeColor","operator":"equals","value":"green"}]}]}'
       );
     });
   });
