@@ -24,6 +24,7 @@ JavaScript rules engine for validating data object structures.
 - 💥 Support for **infinitely nested** `AND` / `OR` conditions.
 - 🚀 Rules can be expressed in **simple JSON**.
 - ✔️ **Customize operators** with your own functions.
+- ✔️ **Customize resolver** with your own functions.
 - 🏄 Access nested properties with **dot notation** paths.
 
 # Installation
@@ -91,6 +92,8 @@ Each `Engine` contains the follow operators by default:
 - `lessThanOrEquals`
 - `greaterThan`
 - `greaterThanOrEquals`
+- `matchRegExp`
+- `notMatchRegExp`
 
 ## Customizing Operators
 
@@ -137,6 +140,8 @@ the `Rule` instance for chaining.
 | `lessThanOrEquals`    | `string`  | `number`   |
 | `greaterThan`         | `string`  | `number`   |
 | `greaterThanOrEquals` | `string`  | `number`   |
+| `matchRegExp`         | `string`  | `string`   |
+| `notMatchRegExp`      | `string`  | `string`   |
 
 Nested conditions can be achieved with the `and()` / `or()` methods. Each methods takes one parameter, a callback
 function that is supplied with a nested `Rule` instance as the first argument, and returns the original `Rule` instance
