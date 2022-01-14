@@ -36,6 +36,11 @@ export class Condition {
   private value: any;
 
   /**
+   * Condition value.
+   */
+  private type?: any;
+
+  /**
    * Condition message.
    */
   private message: string;
@@ -52,7 +57,7 @@ export class Condition {
    */
   evaluate(data: Record<string, unknown>): EvaluateResult {
     const factValue = this.resolver(data, this.fact);
-    const result = this.operator.evaluate(factValue, this.value);
+    const result = this.operator.evaluate(factValue, this.value, this.type);
     return result ? { result } : { result, message: this.message};
   }
 
@@ -64,6 +69,7 @@ export class Condition {
       fact: this.fact,
       operator: this.operatorName,
       value: this.value,
+      type: this.type,
     };
   }
 
@@ -95,6 +101,7 @@ export class Condition {
     this.fact = json.fact;
     this.operatorName = json.operator;
     this.value = json.value;
+    this.type = json.type;
     this.message = json.message;
   }
 }

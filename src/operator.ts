@@ -25,7 +25,7 @@ export class Operator<T extends string = string, F extends any = any, V extends 
    * @param a Left side value.
    * @param b Right side value.
    */
-  evaluate(a: any, b: any) {
-    return this.fn(a, b);
+  evaluate(a: any, b: any, t?: any) {
+    return this.fn(a, b, t);
   }
 }

@@ -6,7 +6,7 @@ export type RuleType = 'and' | 'or';
 /**
  * Operator callback function.
  */
-export type OperatorFn<F extends any = any, V extends any = any> = (a: F, b: V) => boolean;
+export type OperatorFn<F extends any = any, V extends any = any> = (a: F, b: V, t?: any) => boolean;
 
 /**
  * Resolver function.

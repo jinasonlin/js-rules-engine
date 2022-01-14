@@ -188,11 +188,11 @@ export class Rule implements RuleDefaultOperatorMethods {
    * @param value Value to compare.
    */
   add(fact: string, operator: string, value: any): Rule;
-  add(fact: string | RuleJson, operator?: string, value?: any) {
+  add(fact: string | RuleJson, operator?: string, value?: any, type?: any) {
     if (typeof fact !== 'string') {
       this.items.push(new Rule(fact, this.engine));
     } else {
-      this.items.push(new Condition({ fact, operator, value }, this.engine));
+      this.items.push(new Condition({ fact, operator, value, type }, this.engine));
     }
     return this;
   }
