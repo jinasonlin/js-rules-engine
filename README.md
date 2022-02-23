@@ -114,6 +114,20 @@ import { defaultEngine } from 'js-rules-engine';
 defaultEngine.removeOperator('noop');
 ```
 
+## Customizing Resolver
+
+Add your own resolver to an `Engine`.
+
+```js
+import { Engine } from 'js-rules-engine';
+
+const engine = new Engine();
+
+engine.addResolver('someFact', (data, fact) => {
+  return data?.someCompositeProperty;
+});
+```
+
 ## Rule Conditions
 
 The `add` method is a generic way to add a condition to the `Rule`. The conditions operator is added via it's `name`.
@@ -169,6 +183,33 @@ Example JSON structure:
 ```json
 {
   "and": [
+    {
+      "fact": "homeWorld.name",
+      "operator": "equals",
+      "value": "Tatooine"
+    },
+    {
+      "or": [
+        {
+          "fact": "name",
+          "operator": "contains",
+          "value": "Skywalker"
+        },
+        {
+          "fact": "eyeColor",
+          "operator": "equals",
+          "value": "green"
+        }
+      ]
+    }
+  ]
+}
+```
+
+```json
+{
+  "relation": "and",
+  "conditions": [
     {
       "fact": "homeWorld.name",
       "operator": "equals",
